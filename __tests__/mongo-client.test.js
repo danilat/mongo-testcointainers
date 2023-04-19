@@ -10,12 +10,8 @@ describe('mongo client with test containers', () => {
       .withEnvironment({ MONGO_INITDB_DATABASE: DB_NAME })
       .withWaitStrategy(Wait.forLogMessage(/.*waiting for connections.*/i))
       .withStartupTimeout(5_000);
-    await mongoContainer.start().catch(err => console.error(err));
-    (await mongoContainer.logs())
-      .on("data", line => console.log(line))
-      .on("err", line => console.error(line))
-      .on("end", () => console.log("Stream closed"));
-
+    mongoContainer = await mongoContainer.start().catch(err => console.error(err));
+    
     //const mongoUri = `mongodb://localhost:27017/${DB_NAME}`
     const mongoUri = getUriForMongoContainer(mongoContainer);
     console.log(mongoUri)
@@ -55,9 +51,7 @@ const getUriForMongoContainer = (mongoContainer) => {
 const connectToSessionMongoDb = async (mongoUri) => {
   mongoClient = new MongoClient(mongoUri);
   try {
-    console.log('connecting')
     await mongoClient.connect();
-    console.log('connected')
   } catch (error) {
     console.error(error)
   }
@@ -65,7 +59,5 @@ const connectToSessionMongoDb = async (mongoUri) => {
 
 
 const disconnectToSessionMongoDb = async () => {
-  if (mongoClient) {
-    await mongoClient.close();
-  }
+  await mongoClient.close();
 };
