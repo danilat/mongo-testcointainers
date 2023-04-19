@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  mongo:
+    image: mongo:4.4.20
+    environment:
+      MONGO_INITDB_DATABASE: test_db
+    ports:
+      - '27017:27017'
+    restart: always
